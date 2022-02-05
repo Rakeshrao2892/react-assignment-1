@@ -1,4 +1,6 @@
-import BrowserHistory from './components/BrowserHistory'
+import {Component} from 'react'
+
+import BrowserItem from './components/BrowserItem'
 
 import './App.css'
 
@@ -77,6 +79,74 @@ const initialHistoryList = [
   },
 ]
 
-const App = () => <BrowserHistory historyList={initialHistoryList} />
+class App extends Component {
+  state = {searchInput: '', historyList: initialHistoryList}
+
+  onChangeSearchInput = event => {
+    this.setState({searchInput: event.target.value})
+  }
+
+  deleteHistory = id => {
+    const {historyList} = this.state
+    const filteredHistoryList = historyList.filter(
+      eachHistory => eachHistory.id !== id,
+    )
+    this.setState({historyList: filteredHistoryList})
+  }
+
+  renderEmptyView = () => (
+    <div className="no-history-container">
+      <p className="no-history-heading">There is no history to show</p>
+    </div>
+  )
+
+  render() {
+    const {searchInput, historyList} = this.state
+    const searchResult = historyList.filter(eachHistory =>
+      eachHistory.title.toLowerCase().includes(searchInput.toLowerCase()),
+    )
+    const isEmptyList = historyList.length === 0
+
+    return (
+      <div className="app-container">
+        <div className="blue-container">
+          <div className="blue-text-container">
+            <img
+              src="https://assets.ccbp.in/frontend/react-js/history-website-logo-img.png"
+              alt="app logo"
+            />
+          </div>
+          <div className="search-container">
+            <img
+              src="https://assets.ccbp.in/frontend/react-js/search-img.png"
+              alt="search"
+              className="search-icon"
+            />
+            <input
+              type="search"
+              className="search-type"
+              placeholder="Search history"
+              value={searchInput}
+              onChange={this.onChangeSearchInput}
+            />
+          </div>
+        </div>
+        {isEmptyList ? (
+          this.renderEmptyView()
+        ) : (
+          <ul className="white-bg-container">
+            {searchResult.map(eachBrowser => (
+              <BrowserItem
+                key={eachBrowser.id}
+                deleteHistory={this.deleteHistory}
+                browserDetails={eachBrowser}
+              />
+            ))}
+          </ul>
+        )}
+      </div>
+    )
+  }
+}
 
 export default App
